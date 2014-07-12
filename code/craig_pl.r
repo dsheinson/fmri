@@ -176,5 +176,5 @@ craig_pl <- function(n.vox, n.clust, mod.est, n.run, np, dyn, sd.fac=1, mle=FALS
 require(plyr)
 require(doMC)
 registerDoMC()
-mydata = expand.grid(n.vox=1:125,n.clust=1:6,mod.est=c("M101","M011"),n.run=1,np=500)
+mydata = expand.grid(n.vox=1:125,n.clust=1:6,mod.est=c("M101","M011"),n.run=1,np=5000)
 m_ply(mydata, craig_pl, .parallel=T)
