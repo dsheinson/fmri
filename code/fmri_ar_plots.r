@@ -302,6 +302,7 @@ fmri_pl_quant <- function(mod.sim, mod.est, n.par, n.sim, nruns, np, dyn, sd.fac
 }
 
 fmri_pl_quant("M101","M101",560,1,1:5,c(500,1000,5000,10000,20000),mle=FALSE,mcmc=list(n.chains=1:3,nsims=rep(25000,3),nburn=rep(5000,3),nthin=rep(20,3),sd.fac=1,diffuse=FALSE))
+fmri_pl_quant("M011","M011",560,1,1:5,c(500,1000,5000,10000,20000),mle=FALSE,mcmc=list(n.chains=1:3,nsims=rep(25000,3),nburn=rep(5000,3),nthin=rep(20,3),sd.fac=1,diffuse=FALSE))
 
 # Plot log marginal likelihood of each model against parameter values for data simulated from M101
 # npars is a matrix of parameter values
