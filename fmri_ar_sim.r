@@ -19,10 +19,13 @@ dlm_ar_sim <- function(design.lab, N, beta, phi, sigma2s, sigma2m, mod)
   if(mod == "M101")
   {
     FF = U[,d]
+    mod.name = "M011"
   } else if(mod == "M011"){
     FF = rep(1,nt)
+    if(sigma2m != 0) mod.name = "M101" else mod.name = "M100"
   } else if(mod == "M001"){
     FF = rep(0,nt)
+    mod.name = "M001"
   } else {
     stop("mod must be 'M101', 'M011', or 'M001'")
   }
@@ -39,7 +42,7 @@ dlm_ar_sim <- function(design.lab, N, beta, phi, sigma2s, sigma2m, mod)
   pdf(file=paste(gpath,"fmri-ar-sim-",paste(paste(beta,sep="",collapse="-"),phi*100,sigma2s,sigma2m,sep="-"),"-",mod,".pdf",sep=""))
   par(mfrow=c(3,1),mar=c(5,6,4,2))
   plot(1:nt,sim$y,type="l",xlab=expression(t),ylab=expression(y[t]),cex.lab=2)
-  title(eval(bquote(expression(paste("Simulated from ",M[.(paste(strsplit(mod,"")[[1]][2:4],sep="",collapse=""))],sep="")))),cex.main=2)
+  title(eval(bquote(expression(paste("Simulated from ",M[.(paste(strsplit(mod.name,"")[[1]][2:4],sep="",collapse=""))],sep="")))),cex.main=2)
   plot(1:nt,U[,d],type="l",xlab="",ylab=expression(conv[t]),cex.lab=2)
   title(eval(bquote(expression(paste(beta," = (",.(paste(sim$true.params$theta[1:d],sep="",collapse=",")),")",", ",phi," = ",.(sim$true.params$theta[d+1]),", ",sigma[s]^2," = ",.(sim$true.params$theta[d+2]),", ",sigma[m]^2," = ",.(sim$true.params$theta[d+3]))))),cex.main=2)
   plot(0:nt,sim$x,type="l",xlab="",ylab=expression(x[t]),main="",cex.lab=2)
@@ -66,7 +69,7 @@ M001sim = mlply(M001data, function(design.lab,N,phi,sigma2s,sigma2m,mod) dlm_ar_
 sims = list(sim = M001sim, data=M001data)
 save(sims,file=paste(dpath,"fmri-ar-sim-M001.rdata",sep=""))
 
-M010data = expand.grid(design.lab="fmri-design-3-500-1.rdata", N = 1000, phi=c(0.25,0.5,0.75,0.95), sigma2s = 10, sigma2m = 0, mod = "M011", stringsAsFactors=FALSE)
-M010sim = mlply(M010data, function(design.lab,N,phi,sigma2s,sigma2m,mod) dlm_ar_sim(design.lab,N,c(750,15),phi,sigma2s,sigma2m,mod))
+M010data = expand.grid(design.lab="fmri-design-3-500-1.rdata", N = 1000, beta = c(0,5,10,15),phi=c(0.25,0.5,0.75,0.95), sigma2s = 10, sigma2m = 0, mod = "M011", stringsAsFactors=FALSE)
+M010sim = mlply(M010data, function(design.lab,N,beta,phi,sigma2s,sigma2m,mod) dlm_ar_sim(design.lab,N,c(750,beta),phi,sigma2s,sigma2m,mod))
 sims = list(sim = M010sim, data=M010data)
 save(sims,file=paste(dpath,"fmri-ar-sim-M010.rdata",sep=""))
