@@ -66,7 +66,7 @@ M001sim = mlply(M001data, function(design.lab,N,phi,sigma2s,sigma2m,mod) dlm_ar_
 sims = list(sim = M001sim, data=M001data)
 save(sims,file=paste(dpath,"fmri-ar-sim-M001.rdata",sep=""))
 
-M010data = expand.grid(design.lab="fmri-design-3-500-1.rdata", N = 20, phi=c(0.25,0.5,0.75,0.95), sigma2s = 10, sigma2m = 0, mod = "M011", stringsAsFactors=FALSE)
+M010data = expand.grid(design.lab="fmri-design-3-500-1.rdata", N = 1000, phi=c(0.25,0.5,0.75,0.95), sigma2s = 10, sigma2m = 0, mod = "M011", stringsAsFactors=FALSE)
 M010sim = mlply(M010data, function(design.lab,N,phi,sigma2s,sigma2m,mod) dlm_ar_sim(design.lab,N,c(750,15),phi,sigma2s,sigma2m,mod))
 sims = list(sim = M010sim, data=M010data)
 save(sims,file=paste(dpath,"fmri-ar-sim-M010.rdata",sep=""))
