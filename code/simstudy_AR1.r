@@ -10,8 +10,8 @@ require(nlme)
 N = 1000
 np = 4
 nb = 4
-M = 3
-pval = array(NA, c(N, M, np, nb))
+pval = array(NA, c(N, 4, np, nb))
+pval.res = array(NA, c(N, 3, np, nb))
 for(i in 1:np)
 {
   for(j in 1:N)
@@ -28,6 +28,9 @@ for(i in 1:np)
       t = fit.ols$coef[2] / summary(fit.ols)$coef[2,2]
       pval[j,1,i,k] = pt(t, df, lower=FALSE)
       
+      # Box.test on OLS residuals
+      pval.res[j,1,i,k] = Box.test(fit.ols$residuals)$p.val
+      
       # Fit prewhitened data - t-test
       fit.res = arima(fit.ols$residuals, order = c(1,0,0), include.mean=FALSE)
       V = fit.res$coef^as.matrix(dist(0:(length(y)-1)))
@@ -43,22 +46,33 @@ for(i in 1:np)
       fit.reml = gls(y ~ X - 1, correlation=corAR1())
       phi = corMatrix(fit.reml$modelStruct$corStruct)[1,2]
       t = fit.reml$coef[2] / sqrt(fit.reml$varBeta[2,2])
+      pval[j,3,i,k] = pt(t, length(y)-2, lower=FALSE)
       Neff = length(y)*((1-phi)/(1+phi))
       df = Neff - 2
-      pval[j,3,i,k] = pt(t, df, lower=FALSE)
+      pval[j,4,i,k] = pt(t, df, lower=FALSE)
+      
+      # Fit AR(1) and AR(2) using ML and get pvalue of Box.test
+      fit.ar1 = arima(y,order=c(1,0,0),xreg=X[,2])
+      pval.res[j,2,i,k] = Box.test(fit.ar1$residuals)$p.val
+      fit.ar2 = arima(y,order=c(2,0,0),xreg=X[,2])
+      pval.res[j,3,i,k] = Box.test(fit.ar2$residuals)$p.val
       
       print(c(i,j,k))
     }
   }
 }
 
+# Save data
+mypvals = list(pval=pval,pval.res=pval.res)
+save(mypvals,file=paste(dpath,"simstudy_AR1.rdata",sep=""))
+
 # Compute FPRs for all phi's
 alpha = seq(0,1,0.001)
-fpr = array(NA, c(length(alpha),M,np))
+fpr = array(NA, c(length(alpha),4,np))
 neg.df = numeric(np)
 for(i in 1:np)
 {
-  ind = which(is.nan(pval[,3,i,1]))
+  ind = which(is.nan(pval[,4,i,1]))
   neg.df[i] = length(ind) / N
   if(length(ind) > 0) pval.df = pval[-ind,,i,1] else pval.df = pval[,,i,1]
   for(j in 1:length(alpha)) fpr[j,,i] = apply(pval.df,2,function(x) mean(x < alpha[j]))
@@ -67,17 +81,18 @@ for(i in 1:np)
 # Plot false positive rates versus alpha
 phi = unique(sims[[2]]$phi)
 ycut = which(alpha == 0.2)
-pdf(file=paste(gpath,"simstudy-FPR.pdf",sep=""),width=10,height=10)
+pdf(file=paste(gpath,"simstudy-FPR-5.pdf",sep=""),width=10,height=10)
 par(mfrow=c(2,2),mar=c(5,6,4,2)+0.1)
 for(i in 1:np)
 {
   plot(alpha,fpr[,1,i],type="l",xlim=c(0,.2),ylim=c(0,max(fpr[1:ycut,,])),axes=ifelse(i==1,TRUE,FALSE),xlab=ifelse(i==1,expression(alpha),""),ylab=ifelse(i==1,"FPR",""),main=eval(bquote(expression(paste(phi,"=",.(phi[i]))))),cex.lab=1.75,cex.main=1.75)
   if(i != 1) box()
   lines(alpha,fpr[,2,i],col=2)
-  lines(alpha,fpr[,3,i],col=4)
+  lines(alpha,fpr[,3,i],col=3)
+  lines(alpha,fpr[,4,i],col=4)
   abline(0,1,lty=2)
   mtext(paste("Negative DF rate:",neg.df[i]),side=3,cex=0.85)
-  if(i == 1) legend("bottomright",c("OLS","PW","REML"),lty=c(1,1,1),col=c(1,2,4),cex=1.5)
+  if(i == 1) legend("bottomright",c("OLS","PW","REML","REMLc"),lty=c(1,1,1,1),col=c(1,2,3,4),cex=1.5)
 }
 dev.off()
 
@@ -86,28 +101,50 @@ ind = which(alpha %in% c(0.001,0.01,0.05))
 round(fpr[ind,,],3)
 
 # Calculate true postive rates curves
-tpr = array(NA, c(length(alpha),M,np,nb-1))
+tpr = array(NA, c(length(alpha),4,np,nb-1))
 neg.df = matrix(NA,nr=np,nc=nb-1)
 for(k in 2:nb)
 {
   for(i in 1:np)
   {
-    ind = which(is.nan(pval[,3,i,k]))
+    ind = which(is.nan(pval[,4,i,k]))
     neg.df[i,k-1] = length(ind) / N
     if(length(ind) > 0) pval.df = pval[-ind,,i,k] else pval.df = pval[,,i,k]
     for(j in 1:length(alpha)) tpr[j,,i,k-1] = apply(pval.df,2,function(x) mean(x < alpha[j]))
   }
 }
 
-# Plot ROC curve for beta = 5 and phi = 0.95
+# Plot ROC curves: 4 x 4 plots, beta = 3, 6, 9
 beta = unique(sims[[2]]$beta)[-1]
-k = 1; i = 4
-pdf(file=paste(gpath,"simstudy-ROC.pdf",sep=""))
-par(mar=c(5,6,4,2)+0.1)
-plot(fpr[,1,i],tpr[,1,i,k],type="l",xlim=c(0,1),ylim=c(0,1),xlab="FPR",ylab="TPR",main=eval(bquote(expression(paste(phi,"=",.(phi[i]),", ",beta[1],"=",.(beta[k]))))),cex.lab=1.75,cex.main=1.75)
-lines(fpr[,2,i],tpr[,2,i,k],col=2)
-lines(fpr[,3,i],tpr[,3,i,k],col=4)
-abline(0,1,lty=2)
-mtext(paste("Negative DF rate:",neg.df[i,k]),side=3,cex=0.85)
-legend("bottomright",c("OLS","PW","REML"),lty=c(1,1,1),col=c(1,2,4),cex=1.5)
-dev.off()
+for(k in 1:(nb-1))
+{
+  pdf(file=paste(gpath,"simstudy-ROC-",beta[k],".pdf",sep=""),width=10,height=10)
+  par(mfrow=c(2,2),mar=c(5,6,4,2)+0.1)
+  for(i in 1:np)
+  {
+    plot(fpr[,1,i],tpr[,1,i,k],type="l",xlim=c(0,1),ylim=c(0,1),axes=ifelse(i==1,TRUE,FALSE),xlab=ifelse(i==1,"FPR",""),ylab=ifelse(i==1,"TPR",""),main=eval(bquote(expression(paste(phi,"=",.(phi[i]))))),cex.lab=1.75,cex.main=1.75)
+    if(i != 1) box()
+    lines(fpr[,2,i],tpr[,2,i,k],col=2)
+    lines(fpr[,3,i],tpr[,3,i,k],col=3)
+    lines(fpr[,4,i],tpr[,4,i,k],col=4)
+    abline(0,1,lty=2)
+    mtext(paste("Negative DF rate:",neg.df[i,k]),side=3,cex=0.85)
+    legend("bottomright",c("OLS","PW","REML","REMLc"),lty=c(1,1,1,1),col=c(1,2,3,4),cex=1.5)
+  }
+  dev.off()
+}
+
+# Calculate proportion of whitened residuals
+# Calculate true postive rates curves
+pwn = array(NA, c(length(alpha),3,np,nb))
+for(k in 1:nb)
+{
+  for(i in 1:np)
+  {
+    for(j in 1:length(alpha)) pwn[j,,i,k] = apply(pval.res[,,i,k],2,function(x) mean(x > alpha[j]))
+  }
+}
+
+# PWN table
+ind = which(alpha %in% c(0.001,0.01,0.05))
+pwn[ind,,,1]
