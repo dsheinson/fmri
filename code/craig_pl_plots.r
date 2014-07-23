@@ -44,6 +44,7 @@ for(j in 1:dim(mle.converge)[3])
   }
 }
 avg.mle = apply(mle.converge,2:4,function(x) mean(x,na.rm=TRUE))
+round(avg.mle,3)
 
 # Divide voxels into 2 clusters for secondary-visual cortex, based on MLEs
 cluster = array(NA, c(Nv, Nr, Nm))
@@ -60,9 +61,15 @@ for(k in 1:Nm)
       centers[[k]][[j]] = matrix(avg.mle[,j,k],nr=1)
     } else {
       if(mods[k] == "M001") ind = c(1,2,5) else ind = 1:5
-      to.clust = apply(mle.converge[,ind,j,k], 1, function(x) all(!
-                                                                    is.na(x)))
+      to.clust = apply(mle.converge[,ind,j,k], 1, function(x) all(!is.na(x)))
       km = kmeans(mle.converge[to.clust,ind,j,k], centers=2)
+      if(km$centers[1,1] < km$centers[2,1])
+      {
+        km$centers = km$centers[2:1,]
+        tmp = km$cluster
+        km$cluster[which(tmp == 1)] = 2
+        km$cluster[which(tmp == 2)] = 1
+      }
       cluster[to.clust,j,k] = km$cluster
       centers[[k]][[j]] = km$centers
     }
@@ -79,6 +86,8 @@ mix = FALSE
 
 # Load log marginal likelihoods
 lmargliks = array(NA, c(Nv,Nr,length(mods)))
+x = array(NA, dim(out$x))
+phi.ci = array(NA, c(Nv,2,Nr,length(mods)))
 for(k in 1:length(mods))
 {
   for(j in 1:Nr)
@@ -88,7 +97,14 @@ for(k in 1:length(mods))
       if(mods[k] != "M001")
       {
         loaded = try(load(paste(dpath,paste(i,j,mods[k],n.run,np,sd.fac,mle,smooth,mix,sep="-"),".rdata",sep="")),silent=TRUE)
-        if(!(class(loaded) == "try-error")) lmargliks[i,j,k] = pf.out$lmarglik
+        if(!(class(loaded) == "try-error"))
+        {
+          lmargliks[i,j,k] = pf.out$lmarglik
+          x[i,,1,j,k] = NA
+          x[i,,2,j,k] = pf.out$state.quant.filt[,1,1]
+          x[i,,3,j,k] = pf.out$state.quant.filt[,1,2]
+          phi.ci[i,,j,k] = pf.out$theta.quant[nt+1,3,]
+        }
       } else {
         # Calculate marginal likelihood for M001
         y = voxels[i,-(1:6),j]
@@ -169,11 +185,11 @@ for(i in 1:Nr)
     for(j in 1:ceiling(Nv / 25))
     {
       js = (j-1)*25
-      pdf(paste(gpath,"craig_state-",regions[i],"-",mod[k],"-",j,"-",mle,"-",np,".pdf",sep=""),width=24,height=20)
+      pdf(paste(gpath,"craig_state-pl-",regions[i],"-",mod[k],"-",j,"-",mle,"-",np,".pdf",sep=""),width=24,height=20)
       par(mfcol=c(5,6),mar=c(7,6,4,1)+0.1)
       plot(0,0,col="white",axes=FALSE,xlab="",ylab="")
-      ymin = min(x[(js+1):(js+25),,,i,k],na.rm=T)
-      ymax = max(x[(js+1):(js+25),,,i,k],na.rm=T)
+      ymin = min(x[(js+1):(js+25),-(1:25),,i,k],na.rm=T)
+      ymax = max(x[(js+1):(js+25),-(1:25),,i,k],na.rm=T)
       xlab = expression(t)
       ylab = eval(bquote(expression(paste(beta[.(dyn-1)]," + ",x[t]))))
       axes = c(T,rep(F,24))
@@ -185,12 +201,14 @@ for(i in 1:Nr)
         par(mfg=c(row,column))
         if(error[l,i,k] == 0 & converge[l,i,k] == 0)
         {
-          col = ifelse(cluster[l,i,k] == 1, 1, 6)
+          col = ifelse(cluster[l,i,k] == 1, 6, 1)
           if(row == 1 & column == 1)
           {
-            plot(0:nt, x[l,,1,i,k], type="l", col=col, ylim=c(ymin,ymax), xlab=xlab, ylab=ylab, main=substitute(paste(hat(phi)," = ",phihat,sep=""),list(phihat=round(mle.converge[l,3,i,k],3))), cex.lab=2.5, cex.main=2.5, cex.axis=1.4)
+            main = eval(bquote(expression(paste("95% C.I. for ",phi,": (",.(round(phi.ci[l,1,i,k],3)),", ",.(round(phi.ci[l,2,i,k],3)),")",sep=""))))
+            plot(0:nt, x[l,,1,i,k], type="l", col=col, ylim=c(ymin,ymax), xlab=xlab, ylab=ylab, main=main, cex.lab=2.5, cex.main=2.45, cex.axis=1.4)
           } else {
-            plot(0:nt, x[l,,1,i,k], type="l", col=col, ylim=c(ymin,ymax), axes=F, xlab="", ylab="", main=substitute(paste(hat(phi)," = ",phihat,sep=""),list(phihat=round(mle.converge[l,3,i,k],3))), cex.lab=2.5, cex.main=2.5, cex.axis=1.4)
+            main = paste("(",round(phi.ci[l,1,i,k],3),", ",round(phi.ci[l,2,i,k],3),")",sep="")
+            plot(0:nt, x[l,,1,i,k], type="l", col=col, ylim=c(ymin,ymax), axes=F, xlab="", ylab="", main=main, cex.lab=2.5, cex.main=2.5, cex.axis=1.4)
           }
           lines(0:nt, x[l,,2,i,k], col=col, lty=2)
           lines(0:nt, x[l,,3,i,k], col=col, lty=2)
@@ -213,7 +231,7 @@ for(i in 1:Nr)
       }
       par(mfg=c(1,6))
       plot(0:5,0:5,col="white",axes=FALSE,xlab="",ylab="")
-      legend(0,4,c("Cluster 1","Cluster 2","95% CI"), lty=c(1,1,2), cex=3, col=c(1,6,col))
+      legend(0,4,c("Cluster H","Cluster L","95% CI"), lty=c(1,1,2), cex=3, col=c(6,1,col))
       par(mfg=c(2,6))
       plot(0:5,0:5,col="white",axes=FALSE,xlab="",ylab="")
       legend(0,4,mlabels[c(2,1,3)], fill=cols[c(2,1,3)], cex=3)   
