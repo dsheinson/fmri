@@ -32,6 +32,12 @@ for(j in 1:dim(mle.converge)[3])
   for(k in 1:dim(mle.converge)[4])
   {
     ind = which(out$converge[,j,k] == 0 & out$error[,j,k] == 0)
+    if(length(ind) < Nv)
+    {
+      ind.err = which(out$error[,j,k] != 0)
+      ind.con = which(out$converge[,j,k] != 0)
+      print(c(paste("err:",ind.err),paste("con:",ind.con),j,k))
+    }
     mle.converge[ind,,j,k] = out$mle[ind,,j,k]
   }
 }
@@ -91,7 +97,7 @@ for(k in 1:length(par))
         } else {
           image(tmp$x1,tmp$x2,-tmp$fhat, xlab="", ylab=ylab[j,i], main="", cex.lab=2.5,cex.axis=1.25)
         }
-        if(mod[i] != "M001") mtext(paste("Error rate: ",error.rate,", Converge rate: ",conv.rate,sep=""),side=3)
+        #if(mod[i] != "M001") mtext(paste("Error rate: ",error.rate,", Converge rate: ",conv.rate,sep=""),side=3)
         contour(tmp$x1,tmp$x2,tmp$fhat,add=TRUE,drawlabels=F)
         abline(h=0)
         points(centers[[i]][[j]][,1], centers[[i]][[j]][,2], pch='x', col=4,cex=2)
