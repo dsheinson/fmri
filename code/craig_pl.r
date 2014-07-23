@@ -136,14 +136,14 @@ craig_pl <- function(n.vox, n.clust, mod.est, n.run, np, dyn, sd.fac=1, mle=FALS
   }
   
   # Compute state quantiles
-  state.quant.filt = pf.quantile(out$theta[dyn,,,drop=FALSE]+out$state[1,,,drop=FALSE], out$weight, function(x, j) x, c(alpha/2,1-alpha/2))
-  dimnames(state.quant.filt)[[3]] = c(alpha/2,1-alpha/2)
+  state.quant.filt = pf.quantile(out$theta[dyn,,,drop=FALSE]+out$state[1,,,drop=FALSE], out$weight, function(x, j) x, c(alpha/2,.5,1-alpha/2))
+  dimnames(state.quant.filt)[[3]] = c(alpha/2,.5,1-alpha/2)
   if(smooth)
   {
     tmp = resample(out$weight[,nt+1], method="stratified")
     r.theta = out$theta[dyn,tmp$indices,nt+1]
-    state.quant.smooth = pf.quantile((r.theta + out.s$state)[1,,,drop=FALSE], matrix(1/np,nr=np,nc=nt+1), function(x, j) x, c(alpha/2,1-alpha/2))
-    dimnames(state.quant.smooth)[[3]] = c(alpha/2,1-alpha/2)
+    state.quant.smooth = pf.quantile((r.theta + out.s$state)[1,,,drop=FALSE], matrix(1/np,nr=np,nc=nt+1), function(x, j) x, c(alpha/2,.5,1-alpha/2))
+    dimnames(state.quant.smooth)[[3]] = c(alpha/2,.5,1-alpha/2)
   } else {
     state.quant.smooth = "No smoothing done"
   }
@@ -156,12 +156,12 @@ craig_pl <- function(n.vox, n.clust, mod.est, n.run, np, dyn, sd.fac=1, mle=FALS
     Fq=c(rep(list(F1),d+1),list(F2,F3)) # To compute quantiles from mixture distribution
     int = list(c(-10000,10000),c(-10000,10000),c(-10000,10000),c(0,10000),c(0,10000))
     tq = list(out$suff.theta[c(1,3),,], out$suff.theta[c(2,6),,], out$suff.theta[9:10,,], out$suff.theta[c(11,14),,], out$suff.theta[c(7,13),,])
-    theta.quant = pf.mix.quantile(tq, out$weight, Fq, c(alpha/2,1-alpha/2), int)
+    theta.quant = pf.mix.quantile(tq, out$weight, Fq, c(alpha/2,.5,1-alpha/2), int)
     print(paste(n.vox,n.clust,mod.est,n.run,np,sd.fac,mle,smooth,mix,"mix quant",sep="-"))
   } else {
-    theta.quant = pf.quantile(out$theta, out$weight, function(x, j) x, c(alpha/2,1-alpha/2))
+    theta.quant = pf.quantile(out$theta, out$weight, function(x, j) x, c(alpha/2,.5,1-alpha/2))
   }
-  dimnames(theta.quant)[[3]] = c(alpha/2,1-alpha/2)
+  dimnames(theta.quant)[[3]] = c(alpha/2,.5,1-alpha/2)
   
   # Compute log-marginal likelihood
   lmarglik = pf.lmarglik(out)
@@ -176,5 +176,5 @@ craig_pl <- function(n.vox, n.clust, mod.est, n.run, np, dyn, sd.fac=1, mle=FALS
 require(plyr)
 require(doMC)
 registerDoMC()
-mydata = expand.grid(n.vox=1:125,n.clust=1:6,mod.est=c("M101","M011"),n.run=1,np=5000)
+mydata = expand.grid(n.vox=1:125,n.clust=1:6,mod.est=c("M101"),n.run=1,np=5000)
 m_ply(mydata, craig_pl, .parallel=T)
