@@ -11,7 +11,6 @@ N = 1000
 np = 4
 nb = 4
 pval = array(NA, c(N, 4, np, nb))
-pval.res = array(NA, c(N, 3, np, nb))
 for(i in 1:np)
 {
   for(j in 1:N)
@@ -143,7 +142,6 @@ for(k in 1:(nb-1))
 }
 
 # Calculate proportion of whitened residuals
-# Calculate true postive rates curves
 pwn = array(NA, c(length(alpha),3,np,nb))
 for(k in 1:nb)
 {
