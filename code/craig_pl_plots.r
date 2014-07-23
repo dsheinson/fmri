@@ -71,7 +71,7 @@ for(k in 1:Nm)
 
 # pl parameters
 n.run = 1
-np = 500
+np = 5000
 sd.fac = 1
 mle = FALSE
 smooth = FALSE
@@ -121,31 +121,22 @@ pdf(file=paste(gpath,"craig_pl-loglik-",paste(n.run,np,sd.fac,mle,smooth,mix,sep
 par(mfrow=c(2,3),mar=c(7,6,4,2)+0.1,mgp=c(4,1,0))
 for(i in 1:Nr)
 {
-  ind = which(mods == "M001")
-  if(length(ind) > 0)
-  {
-    dlmargliks = lmargliks[,i,-ind,drop=FALSE]
-    md = rep(lmargliks[1,i,ind], 2)
-  } else {
-    dlmargliks = lmargliks
-    md = c(Inf,-Inf)
-  }
-  dmax = max(apply(dlmargliks, 2:3, function(x) max(density(x,na.rm=T)$y,na.rm=TRUE)),na.rm=TRUE)
-  bmax = max(md[2],apply(dlmargliks, 2:3, function(a) max(density(a,na.rm=T)$x,na.rm=TRUE)),na.rm=TRUE) 
-  bmin = min(md[1],apply(dlmargliks, 2:3, function(a) min(density(a,na.rm=T)$x,na.rm=TRUE)),na.rm=TRUE)
-  cols = 2:(length(mods)+1)
+  dmax = max(apply(lmargliks, 2:3, function(x) max(density(x,na.rm=T)$y,na.rm=TRUE))[i,],na.rm=TRUE)
+  bmax = max(apply(lmargliks, 2:3, function(a) max(density(a,na.rm=T)$x,na.rm=TRUE))[i,],na.rm=TRUE) 
+  bmin = min(apply(lmargliks, 2:3, function(a) min(density(a,na.rm=T)$x,na.rm=TRUE))[i,],na.rm=TRUE)
+  cols = c(2,1,4)
   if(i == 1) xlab = "Log marginal likelihood" else xlab=""
   if(i == 1) ylab = "Density" else ylab=""
   plot(density(lmargliks[,i,1],na.rm=T),lwd=2,col=cols[1],main=regions[i],xlab=xlab,ylab=ylab,xlim=c(bmin,bmax),ylim=c(0,dmax),cex.axis=1.5,cex.lab=1.75,cex.main=2.5)
   if(length(mods) > 1) for(k in 2:length(mods)) lines(density(lmargliks[,i,k],na.rm=T),lwd=2,col=cols[k])
-  if(i == 1) legend("topright",legend=mlabels,lty=rep(1,length(mods)),lwd=rep(2,length(mods)),col=cols,cex=1.3)
+  if(i == 1) legend("topleft",legend=mlabels[c(2,1,3)],lty=rep(1,length(mods)),lwd=rep(2,length(mods)),col=cols[c(2,1,3)],cex=2.2)
 }
 dev.off()
 
 # Compositional plots across regions
 require(compositions)
-pdf(file=paste(gpath,"craig_pl-comp-",paste(n.run,np,sd.fac,mle,smooth,mix,sep="-"),".pdf",sep=""),width=15,height=10)
-par(mfrow=c(2,3),mar=c(7,6,4,2)+0.1,mgp=c(4,1,0))
+pdf(file=paste(gpath,"craig_pl-comp-",paste(n.run,np,sd.fac,mle,smooth,mix,sep="-"),".pdf",sep=""),width=9,height=6)
+par(mfrow=c(2,3),cex.lab=2.25)
 pmargliks = array(NA, dim(lmargliks))
 for(i in 1:Nr)
 {
@@ -158,10 +149,15 @@ for(i in 1:Nr)
   # Compositional plot
   ac = acomp(pmargliks[,i,])
   for(j in 1:Nv) for(k in 1:length(mods)) if(is.BDL(ac[j,k])) ac[j,k] = 1e-6
-  plot(ac, plotMissings=FALSE, labels=mlabels, lwd=2, cex.lab=2)
-  title(regions[i],cex.main=2)
+  plot(ac, plotMissings=FALSE, labels=mlabels)
+  title(regions[i],cex.main=2.5)
 }
 dev.off()
+
+# Table of % clusters preferring each model
+v.pick = apply(pmargliks, 1:2, function(x) which(x == max(x)))
+tab = cbind(apply(v.pick,2,function(x) sum(x == 1)),apply(v.pick,2,function(x) sum(x == 2)),apply(v.pick,2,function(x) sum(x == 3))) / Nv
+tab
 
 # Plot smoothed dynamic slopes with cluster identification and postmodprobs
 mod = mods
