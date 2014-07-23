@@ -72,7 +72,7 @@ neg.df = numeric(np)
 for(i in 1:np)
 {
   ind = which(is.nan(pval[,4,i,1]))
-  neg.df[i] = length(ind) / N
+  neg.df[i] = length(ind)
   if(length(ind) > 0) pval.df = pval[-ind,,i,1] else pval.df = pval[,,i,1]
   for(j in 1:length(alpha)) fpr[j,,i] = apply(pval.df,2,function(x) mean(x < alpha[j]))
 }
@@ -86,19 +86,19 @@ for(i in 1:np)
 {
   plot(alpha,fpr[,1,i],type="l",xlim=c(0,.2),ylim=c(0,max(fpr[1:ycut,,])),axes=ifelse(i==1,TRUE,FALSE),xlab=ifelse(i==1,expression(alpha),""),ylab=ifelse(i==1,"FPR",""),main=eval(bquote(expression(paste(phi,"=",.(phi[i]))))),cex.lab=1.75,cex.main=1.75)
   if(i != 1) box()
-  lines(alpha,fpr[,1,i]-1.96*sqrt(fpr[,1,i]*(1-fpr[,1,i])/(N-neg.df[i]*N)),lty=2)
-  lines(alpha,fpr[,1,i]+1.96*sqrt(fpr[,1,i]*(1-fpr[,1,i])/(N-neg.df[i]*N)),lty=2)
+  lines(alpha,fpr[,1,i]-1.96*sqrt(fpr[,1,i]*(1-fpr[,1,i])/(N-neg.df[i])),lty=2)
+  lines(alpha,fpr[,1,i]+1.96*sqrt(fpr[,1,i]*(1-fpr[,1,i])/(N-neg.df[i])),lty=2)
   lines(alpha,fpr[,2,i],col=2)
-  lines(alpha,fpr[,2,i]-1.96*sqrt(fpr[,2,i]*(1-fpr[,2,i])/(N-neg.df[i]*N)),col=2,lty=2)
-  lines(alpha,fpr[,2,i]+1.96*sqrt(fpr[,2,i]*(1-fpr[,2,i])/(N-neg.df[i]*N)),col=2,lty=2)
+  lines(alpha,fpr[,2,i]-1.96*sqrt(fpr[,2,i]*(1-fpr[,2,i])/(N-neg.df[i])),col=2,lty=2)
+  lines(alpha,fpr[,2,i]+1.96*sqrt(fpr[,2,i]*(1-fpr[,2,i])/(N-neg.df[i])),col=2,lty=2)
   lines(alpha,fpr[,3,i],col=3)
-  lines(alpha,fpr[,3,i]-1.96*sqrt(fpr[,3,i]*(1-fpr[,3,i])/(N-neg.df[i]*N)),col=3,lty=2)
-  lines(alpha,fpr[,3,i]+1.96*sqrt(fpr[,3,i]*(1-fpr[,3,i])/(N-neg.df[i]*N)),col=3,lty=2)
+  lines(alpha,fpr[,3,i]-1.96*sqrt(fpr[,3,i]*(1-fpr[,3,i])/(N-neg.df[i])),col=3,lty=2)
+  lines(alpha,fpr[,3,i]+1.96*sqrt(fpr[,3,i]*(1-fpr[,3,i])/(N-neg.df[i])),col=3,lty=2)
   lines(alpha,fpr[,4,i],col=4)
-  lines(alpha,fpr[,4,i]-1.96*sqrt(fpr[,4,i]*(1-fpr[,4,i])/(N-neg.df[i]*N)),col=4,lty=2)
-  lines(alpha,fpr[,4,i]+1.96*sqrt(fpr[,4,i]*(1-fpr[,4,i])/(N-neg.df[i]*N)),col=4,lty=2)
+  lines(alpha,fpr[,4,i]-1.96*sqrt(fpr[,4,i]*(1-fpr[,4,i])/(N-neg.df[i])),col=4,lty=2)
+  lines(alpha,fpr[,4,i]+1.96*sqrt(fpr[,4,i]*(1-fpr[,4,i])/(N-neg.df[i])),col=4,lty=2)
   abline(0,1,lwd=2,col='gray')
-  mtext(paste("Negative DF rate:",neg.df[i]),side=3,cex=0.85)
+  #mtext(paste("Negative DF rate:",neg.df[i]),side=3,cex=0.85)
   if(i == 1) legend("topleft",c("OLS","PW","REML","REMLc","95% CI",expression(alpha)),lty=c(1,1,1,1,2,1),col=c(1,2,3,4,1,'gray'),lwd=c(1,1,1,1,1,2),cex=1.4)
 }
 dev.off()
@@ -115,7 +115,7 @@ for(k in 2:nb)
   for(i in 1:np)
   {
     ind = which(is.nan(pval[,4,i,k]))
-    neg.df[i,k-1] = length(ind) / N
+    neg.df[i,k-1] = length(ind)
     if(length(ind) > 0) pval.df = pval[-ind,,i,k] else pval.df = pval[,,i,k]
     for(j in 1:length(alpha)) tpr[j,,i,k-1] = apply(pval.df,2,function(x) mean(x < alpha[j]))
   }
@@ -135,7 +135,7 @@ for(k in 1:(nb-1))
     lines(fpr[,3,i],tpr[,3,i,k],col=3)
     lines(fpr[,4,i],tpr[,4,i,k],col=4)
     abline(0,1,lty=2)
-    mtext(paste("Negative DF rate:",neg.df[i,k]),side=3,cex=0.85)
+    #mtext(paste("Negative DF rate:",neg.df[i,k]),side=3,cex=0.85)
     legend("bottomright",c("OLS","PW","REML","REMLc"),lty=c(1,1,1,1),col=c(1,2,3,4),cex=1.5)
   }
   dev.off()
@@ -153,4 +153,4 @@ for(k in 1:nb)
 
 # PWN table
 ind = which(alpha %in% c(0.001,0.01,0.05))
-pwn[ind,,,1]
+pwn[ind,,,4]
