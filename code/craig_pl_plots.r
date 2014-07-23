@@ -169,49 +169,54 @@ for(i in 1:Nr)
     for(j in 1:ceiling(Nv / 25))
     {
       js = (j-1)*25
-      pdf(paste(gpath,"craig_state-",regions[i],"-",mod[k],"-",j,"-",mle,".pdf",sep=""),width=20,height=20)
-      par(mfcol=c(5,5),mfg=c(5,1),mar=c(7,6,4,1)+0.1)
+      pdf(paste(gpath,"craig_state-",regions[i],"-",mod[k],"-",j,"-",mle,"-",np,".pdf",sep=""),width=24,height=20)
+      par(mfcol=c(5,6),mar=c(7,6,4,1)+0.1)
+      plot(0,0,col="white",axes=FALSE,xlab="",ylab="")
       ymin = min(x[(js+1):(js+25),,,i,k],na.rm=T)
       ymax = max(x[(js+1):(js+25),,,i,k],na.rm=T)
-      xlab = c(expression(t),rep("",24))
-      ylab = c(eval(bquote(expression(paste(beta[.(dyn-1)]," + ",x[t])))),rep("",24))
+      xlab = expression(t)
+      ylab = eval(bquote(expression(paste(beta[.(dyn-1)]," + ",x[t]))))
       axes = c(T,rep(F,24))
       for(l in (js+1):(js+25))
       {
         ind = ifelse(l == (js+25),25,l %% 25)
+        column = ifelse(ind %% 5 == 0,ind %/% 5,ind %/% 5 + 1)
+        row = 6 - ifelse(ind %% 5 == 0, 5, ind %% 5)
+        par(mfg=c(row,column))
         if(error[l,i,k] == 0 & converge[l,i,k] == 0)
         {
           col = ifelse(cluster[l,i,k] == 1, 1, 6)
-          plot(0:nt, x[l,,1,i,k], type="l", col=col, ylim=c(ymin,ymax), axes=axes[ind], xlab=xlab[ind], ylab=ylab[ind], main=substitute(paste(hat(phi)," = ",phihat,sep=""),list(phihat=round(mle.converge[l,3,i,k],3))), cex.lab=2.5, cex.main=2.5, cex.axis=1.4)
+          if(row == 1 & column == 1)
+          {
+            plot(0:nt, x[l,,1,i,k], type="l", col=col, ylim=c(ymin,ymax), xlab=xlab, ylab=ylab, main=substitute(paste(hat(phi)," = ",phihat,sep=""),list(phihat=round(mle.converge[l,3,i,k],3))), cex.lab=2.5, cex.main=2.5, cex.axis=1.4)
+          } else {
+            plot(0:nt, x[l,,1,i,k], type="l", col=col, ylim=c(ymin,ymax), axes=F, xlab="", ylab="", main=substitute(paste(hat(phi)," = ",phihat,sep=""),list(phihat=round(mle.converge[l,3,i,k],3))), cex.lab=2.5, cex.main=2.5, cex.axis=1.4)
+          }
           lines(0:nt, x[l,,2,i,k], col=col, lty=2)
           lines(0:nt, x[l,,3,i,k], col=col, lty=2)
           abline(h=0, col='gray', lwd=2)
           box()
-          pd = numeric(length(mods))
-          cols = 1:length(mods) + 1
+          pd = numeric(length(mods)+1)
+          cols = c(2,1,4)
+          xrange = nt + .04*(nt+1) - (-.04*(nt+1))
+          pd[1] = -.04*(nt+1)
           for(m in 1:length(mods))
           {
-            if(m == 1)
-            {
-              pd[m] = nt*pmargliks[l,i,m] 
-              segments(pd[m],ymax+0.03*(ymax-ymin),pd[m],ymax-0.05*(ymax-ymin),lwd=2)
-              polygon(c(pd[m],pd[m],0,0),c(ymax-0.05*(ymax-ymin),ymax+0.03*(ymax-ymin),ymax+0.03*(ymax-ymin),ymax-0.05*(ymax-ymin)),col=cols[m])
-            } else {
-              pd[m] = pd[m-1] + nt*pmargliks[l,i,m]
-              segments(pd[m],ymax+0.03*(ymax-ymin),pd[m],ymax-0.05*(ymax-ymin),lwd=2)
-              polygon(c(pd[m],pd[m],pd[m-1],pd[m-1]),c(ymax-0.05*(ymax-ymin),ymax+0.03*(ymax-ymin),ymax+0.03*(ymax-ymin),ymax-0.05*(ymax-ymin)),col=cols[m])
-            }
+            pd[m+1] = pd[m] + xrange*pmargliks[l,i,m]
+            polygon(c(pd[m],pd[m],pd[m+1],pd[m+1]),c(ymax-0.04*(ymax-ymin),ymax+0.04*(ymax-ymin),ymax+0.04*(ymax-ymin),ymax-0.04*(ymax-ymin)),col=cols[m],border=NA)
           }
-#          for(m in 1:length(mods)) if(m == 1) mtext(mlabels[m], side=3, at = pd[m]/2, line = -1.5) else mtext(mlabels[m], side=3, at = pd[m-1] + (pd[m]-pd[m-1])/2, line = -1.5)
-          abline(h=ymax-0.05*(ymax-ymin),lwd=2)
-          if(l == (js+1)) legend("bottomright",c("Cluster 1","Cluster 2","95% CI"), lty=c(1,1,2), cex=1.5, col=c(1,6,col))
-          if(l == (js+6)) legend("bottomright",mlabels, fill=cols, cex=1.5)          
         } else {
           plot(0:5,0:5,main="",xlab="",ylab="",axes=FALSE,col='white')
           legend(c(1,4), paste(c("Error: ","Converge: "),c(error[l,i,k],converge[l,i,k]),sep=""),cex=1.5)
           box()
         }
       }
+      par(mfg=c(1,6))
+      plot(0:5,0:5,col="white",axes=FALSE,xlab="",ylab="")
+      legend(0,4,c("Cluster 1","Cluster 2","95% CI"), lty=c(1,1,2), cex=3, col=c(1,6,col))
+      par(mfg=c(2,6))
+      plot(0:5,0:5,col="white",axes=FALSE,xlab="",ylab="")
+      legend(0,4,mlabels[c(2,1,3)], fill=cols[c(2,1,3)], cex=3)   
       dev.off()
     }
   }
