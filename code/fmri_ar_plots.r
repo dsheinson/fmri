@@ -660,7 +660,7 @@ fmri_pl_loglik_dens <- function(mod.sim, n.par, n.sim, mods, np, nruns, sd.fac=1
     bmax = max(md[2],apply(dlmargliks, 2:3, function(a) max(density(a)$x,na.rm=TRUE)),na.rm=TRUE) 
     bmin = min(md[1],apply(dlmargliks, 2:3, function(a) min(density(a)$x,na.rm=TRUE)),na.rm=TRUE)
   }
-  cols = 2:(length(mods)+1)
+  cols = c(1,2,4)
   ncol = ceiling(sqrt(length(np)))
   nrow = ceiling(length(np) / ncol)
   pdf(file=paste(gpath,"fmri_pl_loglik-",paste(mod.sim,n.par,n.sim,sep="-"),".pdf",sep=""),width=5*ncol,height=5*nrow)
@@ -671,10 +671,12 @@ fmri_pl_loglik_dens <- function(mod.sim, n.par, n.sim, mods, np, nruns, sd.fac=1
   {
     if(mods[1] != "M001")
     {
-      plot(density(lmargliks[,1,i]),lwd=2,col=cols[1],main=paste(np[i], " particles",sep=""),xlab=xlab[i],ylab=ylab[i],xlim=c(bmin,bmax),ylim=c(0,dmax),cex.axis=1.5,cex.lab=1.75,cex.main=2.5)
+      plot(density(lmargliks[,1,i]),axes=ifelse(i==1,T,F),lwd=2,col=cols[1],main=paste(np[i], " particles",sep=""),xlab=xlab[i],ylab=ylab[i],xlim=c(bmin,bmax),ylim=c(0,dmax),cex.axis=1.5,cex.lab=1.75,cex.main=2.5)
+      box()
     } else {
-      plot(0,0,lwd=2,col="white",main=paste(np[i], " particles",sep=""),xlab=xlab[i],ylab=ylab[i],xlim=c(bmin,bmax),ylim=c(0,dmax),cex.axis=1.5,cex.lab=1.75,cex.main=2.5)
+      plot(0,0,lwd=2,axes=ifelse(i==1,T,F),col="white",main=paste(np[i], " particles",sep=""),xlab=xlab[i],ylab=ylab[i],xlim=c(bmin,bmax),ylim=c(0,dmax),cex.axis=1.5,cex.lab=1.75,cex.main=2.5)
       abline(v=lmargliks[1,1,i], col=cols[1])
+      box()
     }
     if(length(mods) > 1) for(k in 2:length(mods)) if(mods[k] != "M001") lines(density(lmargliks[,k,i]),lwd=2,col=cols[k]) else abline(v=lmargliks[1,k,i], col=cols[k])
     if(i == 1) legend("topleft",legend=mlabels,lty=rep(1,length(mods)),lwd=rep(2,length(mods)),col=cols,cex=nrow)
@@ -766,12 +768,12 @@ fmri_pl_loglik_comp <- function(mod.sim, n.par, n.sim, mods, np, nruns, sd.fac=1
   ncol = ceiling(sqrt(length(np)))
   nrow = ceiling(length(np) / ncol)
   pdf(file=paste(gpath,"fmri_pl_comp-",paste(mod.sim,n.par,n.sim,sep="-"),".pdf",sep=""),width=5*ncol,height=5*nrow)
-  par(mfrow=c(nrow,ncol))
+  par(mfrow=c(nrow,ncol),cex.lab=2)
   for(i in 1:length(np))
   {
     plot(acomp(pmargliks[,,i]),labels=mlabels, lwd=2)
     title(paste(np[i]," particles",sep=""),cex.main=2)
-    if(i == 1) mtext(eval(bquote(expression(paste(M[.(paste(strsplit(mod.sim.name,"")[[1]][2:4],sep="",collapse=""))],": ",beta," = (",.(paste(sim$true.params$theta[1:d],sep="",collapse=",")),")",", ",phi," = ",.(sim$true.params$theta[d+1]),", ",sigma[s]^2," = ",.(sim$true.params$theta[d+2]),", ",sigma[m]^2," = ",.(sim$true.params$theta[d+3]))))),side=3,line=-1)
+    if(i == 1) mtext(eval(bquote(expression(paste(M[.(paste(strsplit(mod.sim.name,"")[[1]][2:4],sep="",collapse=""))],": ",beta," = (",.(paste(sim$true.params$theta[1:d],sep="",collapse=",")),")",", ",phi," = ",.(sim$true.params$theta[d+1]),", ",sigma[s]^2," = ",.(sim$true.params$theta[d+2]),", ",sigma[m]^2," = ",.(sim$true.params$theta[d+3]))))),side=3,cex=1.2,line=-1)
   }
   dev.off()
 }
