@@ -357,7 +357,7 @@ fmri_pl_loglik <- function(mod.sim, nsims, np, mods, npars, wpars, nruns, sd.fac
       ncol = ceiling(sqrt(prod(sapply(upar,length))))
       nrow = ceiling(prod(sapply(upar, length)) / ncol)
       pdf(file=paste(gpath,"fmri_pl_loglik-",paste(mod.sim,n.sim,np,wpars[k],npars[1],npars[length(npars)],paste(sd.fac,sep="",collapse="-"),sep="-"),".pdf",sep=""),width=4*ncol,height=4*nrow)
-      par(mfrow=c(nrow,ncol),mar=c(8,7,5,2)+0.1,mgp=c(4.5,1,0))
+      par(mfrow=c(nrow,ncol),mar=c(8,7.5,5,2)+0.1,mgp=c(5,1,0))
       
       # Index over each set of unique fixed parameter values
       uind = rep(1, length(upar))
@@ -476,7 +476,7 @@ fmri_pl_loglik <- function(mod.sim, nsims, np, mods, npars, wpars, nruns, sd.fac
             main = ""
             leg = FALSE
           }
-          plot(par, lmargliks[1,,1], type="b", ylim=c(min(lmargliks,na.rm=T),max(lmargliks,na.rm=T)), xlab=xlab, ylab=ylab, main=main, cex.main=max((ncol+nrow)/3.6,1), cex.lab=max((ncol+nrow)/3.6,1), cex.axis=max((ncol+nrow)/6.92,1))
+          plot(par, lmargliks[1,,1], type="b", ylim=c(min(lmargliks,na.rm=T),max(lmargliks,na.rm=T)), xlab=xlab, ylab=ylab, main=main, cex.main=2.25, cex.lab=2.25, cex.axis=1.25)
           if(wpars[k] == "phi")
           {
             expr = substitute(paste(sigma[s]^2," = ",a1,", ",sigma[m]^2," = ",a2,sep=""),list(a1=pars[ind[1],2],a2=pars[ind[1],3]))
@@ -485,7 +485,7 @@ fmri_pl_loglik <- function(mod.sim, nsims, np, mods, npars, wpars, nruns, sd.fac
           } else {
             expr = substitute(paste(phi," = ",a1,", ",sigma[s]^2," = ",a2,sep=""),list(a1=pars[ind[1],1],a2=pars[ind[1],2]))
           }
-          mtext(expr,side=3)
+          mtext(expr,side=3,cex=1.1)
           if(length(nruns) > 1)
           {
             for(i in 2:length(nruns)) lines(par,lmargliks[i,,1],type="b")
@@ -522,7 +522,7 @@ fmri_pl_loglik <- function(mod.sim, nsims, np, mods, npars, wpars, nruns, sd.fac
             } else {
               leg.names = mlabels
             }
-            legend(ifelse(mod.sim=="M001","topright","bottomleft"),leg.names,lty=ltys,pch=rep(1,dim(lmargliks)[3]),col=cols,cex=ifelse(mod.sim=="M001",0.75,1))
+            legend(ifelse(mod.sim=="M001","topright","bottomleft"),leg.names,lty=ltys,pch=rep(1,dim(lmargliks)[3]),col=cols,cex=1.75,bg="white")
           }
         }
         
@@ -567,11 +567,11 @@ fmri_pl_loglik <- function(mod.sim, nsims, np, mods, npars, wpars, nruns, sd.fac
       plot(phi.snr[[1]][,1,i],phi.snr[[1]][,2,i],type="b",xlim=c(xmin,xmax),ylim=c(ymin,ymax),xlab=xlab,ylab=ylab,main=substitute(paste(kappa,"=",aa),list(aa=sd.fac[i])),cex.lab=2.25,cex.main=2.25,cex.axis=1.2)
       if(length(phi.snr) > 1)
       {
-        for(j in 2:length(phi.snr)) lines(phi.snr[[j]][,1,i],phi.snr[[j]][,2,i],type="l",col=j)
+        for(j in 2:length(phi.snr)) lines(phi.snr[[j]][,1,i],phi.snr[[j]][,2,i],type="b",col=2*(j-1))
       }
       if(i == 1)
       {
-        legend("topright",legend=nsims,lty=rep(1,length(nsims)),col=1:length(nsims),title=eval(bquote(expression(paste("Sim from ",M[.(paste(strsplit(mod.sim.name,"")[[1]][2:4],sep="",collapse=""))],sep="")))))
+        legend("topright",legend=nsims,lty=rep(1,length(nsims)),col=c(1,2*(2:length(nsims)-1)),title=eval(bquote(expression(paste("Sim from ",M[.(paste(strsplit(mod.sim.name,"")[[1]][2:4],sep="",collapse=""))],sep="")))),cex=1.2)
       }
     }
     dev.off()
