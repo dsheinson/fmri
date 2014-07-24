@@ -476,7 +476,16 @@ fmri_pl_loglik <- function(mod.sim, nsims, np, mods, npars, wpars, nruns, sd.fac
             main = ""
             leg = FALSE
           }
-          plot(par, lmargliks[1,,1], type="b", ylim=c(min(lmargliks,na.rm=T),max(lmargliks,na.rm=T)), xlab=xlab, ylab=ylab, main=main, cex.main=2.25, cex.lab=2.25, cex.axis=1.25)
+          inf.ind = which(lmargliks == -Inf | lmargliks == Inf)
+          if(length(inf.ind) > 0)
+          {
+            ymin = min(lmargliks[-inf.ind],na.rm=T)
+            ymax = max(lmargliks[-inf.ind],na.rm=T)
+          } else {
+            ymin = min(lmargliks,na.rm=T)
+            ymax = max(lmargliks,na.rm=T)
+          }
+          plot(par, lmargliks[1,,1], type="b", ylim=c(ymin,ymax), xlab=xlab, ylab=ylab, main=main, cex.main=2.25, cex.lab=2.25, cex.axis=1.25)
           if(wpars[k] == "phi")
           {
             expr = substitute(paste(sigma[s]^2," = ",a1,", ",sigma[m]^2," = ",a2,sep=""),list(a1=pars[ind[1],2],a2=pars[ind[1],3]))
@@ -578,10 +587,10 @@ fmri_pl_loglik <- function(mod.sim, nsims, np, mods, npars, wpars, nruns, sd.fac
   }
 }
 
-fmri_pl_loglik("M101", 1:3, 500, c("M101","M011","M001"), 496:590, c("phi","sigma2s"), 1:3, sd.fac=c(1,5,10,15))
-fmri_pl_loglik("M101", 1:3, 500, c("M101","M011","M001"), 496:590, c("phi","sigma2s"), 1:3)
-fmri_pl_loglik("M011", 1:3, 500, c("M101","M011","M001"), 496:590, c("phi","sigma2s"), 1:3, sd.fac=c(1,5,10,15))
-fmri_pl_loglik("M011", 1:3, 500, c("M101","M011","M001"), 496:590, c("phi","sigma2s"), 1:3)
+fmri_pl_loglik("M101", 1:3, 500, c("M101","M011","M001"), 496:594, c("phi","sigma2s"), 1:3, sd.fac=c(1,5,10,15))
+fmri_pl_loglik("M101", 1:3, 500, c("M101","M011","M001"), 496:594, c("phi","sigma2s"), 1:3)
+fmri_pl_loglik("M011", 1:3, 500, c("M101","M011","M001"), 496:594, c("phi","sigma2s"), 1:3, sd.fac=c(1,5,10,15))
+fmri_pl_loglik("M011", 1:3, 500, c("M101","M011","M001"), 496:594, c("phi","sigma2s"), 1:3)
 fmri_pl_loglik("M001", 1, 500, c("M101","M011","M001"), 1:9, c("sigma2s","sigma2m"), 1:3)
 fmri_pl_loglik("M001", 1, 500, c("M101","M011","M001"), 1:9, c("sigma2s","sigma2m"), 1:3, sd.fac=c(1,5,10,15))
 
