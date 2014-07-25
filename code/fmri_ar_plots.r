@@ -253,9 +253,9 @@ fmri_pl_quant <- function(mod.sim, mod.est, n.par, n.sim, nruns, np, dyn, sd.fac
   ncol = ceiling(sqrt(d+3))
   nrow = ceiling((d+3) / ncol)
   pdf(file=paste(gpath,"fmri_pl_quant-",paste(mod.sim,mod.est,n.par,n.sim,sd.fac,mle,smooth,mix,sep="-"),".pdf",sep=""),width=5*ncol,height=5*nrow)
-  par(mfrow=c(nrow,ncol), mar = c(5,6,6,2) + 0.1)
-  plot(0:nt,sim$x+sim$true.params$theta[dyn],type="l",col='gray',lwd=3,ylim=c(gmin[d+3],gmax[d+3]),xlab=expression(t),ylab=eval(bquote(expression(paste(beta[.(dyn-1)]," + ",x[t])))),cex.lab=2,cex.axis=1.2)
-  mtext(substitute(paste(B0['1,1'],"=",a2,",",B0['2,2'],"=",a3,",",Phi[0],"=",a5),list(a2=pf.out$prior$B0[1,1],a3=pf.out$prior$B0[2,2],a5=pf.out$prior$Phi0)),side=3)
+  par(mfrow=c(nrow,ncol), mar = c(7,9,9,2) + 0.1,mgp=c(4,1,0))
+  plot(0:nt,sim$x+sim$true.params$theta[dyn],type="l",col='gray',lwd=3,ylim=c(gmin[d+3],gmax[d+3]),xlab=expression(t),ylab=eval(bquote(expression(paste(beta[.(dyn-1)]," + ",x[t])))),cex.lab=4,cex.axis=1.9)
+  mtext(substitute(paste(B0['1,1'],"=",a2,",",B0['2,2'],"=",a3,",",Phi[0],"=",a5),list(a2=pf.out$prior$B0[1,1],a3=pf.out$prior$B0[2,2],a5=pf.out$prior$Phi0)),side=3,cex=1.5)
   for(j in 1:length(np))
   {
     for(i in nruns)
@@ -273,18 +273,18 @@ fmri_pl_quant <- function(mod.sim, mod.est, n.par, n.sim, nruns, np, dyn, sd.fac
       lines(0:nt,mcmc.x.quant[,1],lwd=2)
       lines(0:nt,mcmc.x.quant[,2],lwd=2)
     } else {
-      points(c(nt,nt),mcmc.x.quant[nt+1,],lwd=2, pch='x',cex=2)
+      points(c(nt,nt),mcmc.x.quant[nt+1,],lwd=3, pch='x',cex=3.5)
     }
   }
   for(k in 1:length(par.ind))
   {
-    plot(0:nt,rep(sim$true.params$theta[par.ind[k]],nt+1),type="l",col='gray',lwd=3,ylim=c(gmin[k],gmax[k]),xlab="",ylab=expr[k],cex.lab=2,cex.axis=1.2)
+    plot(0:nt,rep(sim$true.params$theta[par.ind[k]],nt+1),type="l",col='gray',lwd=3,ylim=c(gmin[k],gmax[k]),xlab="",ylab=expr[k],cex.lab=4,cex.axis=1.9)
     if(k==1)
     {
-      title(eval(bquote(expression(paste("Sim: ",M[.(paste(strsplit(mod.sim.name,"")[[1]][2:4],sep="",collapse=""))],", Fit: ", M[.(paste(strsplit(mod.est.name,"")[[1]][2:4],sep="",collapse=""))])))), cex.main=3)
-      mtext(eval(bquote(expression(paste(beta," = (",.(paste(sim$true.params$theta[1:d],sep="",collapse=",")),")",", ",phi," = ",.(sim$true.params$theta[d+1]),", ",sigma[s]^2," = ",.(sim$true.params$theta[d+2]),", ",sigma[m]^2," = ",.(sim$true.params$theta[d+3]))))),side=3)
+      title(eval(bquote(expression(paste("Sim: ",M[.(paste(strsplit(mod.sim.name,"")[[1]][2:4],sep="",collapse=""))],", Fit: ", M[.(paste(strsplit(mod.est.name,"")[[1]][2:4],sep="",collapse=""))])))), cex.main=4,line=5)
+      mtext(eval(bquote(expression(paste(beta," = (",.(paste(sim$true.params$theta[1:d],sep="",collapse=",")),")",", ",phi," = ",.(sim$true.params$theta[d+1]),", ",sigma[s]^2," = ",.(sim$true.params$theta[d+2]),", ",sigma[m]^2," = ",.(sim$true.params$theta[d+3]))))),side=3,cex=1.5)
     } else if(k==ncol-1) {
-      mtext(substitute(paste(a['m0'],"=",a0,",",b['m0'],"=",a1,",",a['s0'],"=",a2,",",b['s0'],"=",a3),list(a0=round(pf.out$prior$am0,2),a1=round(pf.out$prior$bm0,2),a2=round(pf.out$prior$as0,2),a3=round(pf.out$prior$bs0,2))),side=3)
+      mtext(substitute(paste(a['m0'],"=",a0,",",b['m0'],"=",a1,",",a['s0'],"=",a2,",",b['s0'],"=",a3),list(a0=round(pf.out$prior$am0,2),a1=round(pf.out$prior$bm0,2),a2=round(pf.out$prior$as0,2),a3=round(pf.out$prior$bs0,2))),side=3,cex=1.5)
     }
     for(j in 1:length(np))
     {
@@ -295,8 +295,8 @@ fmri_pl_quant <- function(mod.sim, mod.est, n.par, n.sim, nruns, np, dyn, sd.fac
         lines(0:nt, pf.out$theta.quant[,par.ind[k],2], col=j+1)
       }
     }
-    if(!missing(mcmc)) points(c(nt,nt),mcmc.theta.quant[k,],lwd=2, pch='x',cex=2) 
-    if(k == ncol-1) legend("bottomright",c(paste(np,"particles"),"MCMC","Truth"),pch=c(rep(NA,length(np)),'x',NA),lty=c(rep(1,length(np)),1,1),lwd=c(rep(1,length(np)),2,3),col=c(2:(length(np)+1),1,'gray'),cex=1.5)
+    if(!missing(mcmc)) points(c(nt,nt),mcmc.theta.quant[k,],lwd=3, pch='x',cex=3.5) 
+    if(k == ncol-1) legend("bottomright",c(paste(np,"particles"),"MCMC","Truth"),pch=c(rep(NA,length(np)),'x',NA),lty=c(rep(1,length(np)),NA,1),lwd=c(rep(1,length(np)),3,3),col=c(2:(length(np)+1),1,'gray'),cex=1.75)
   }
   dev.off()
 }
