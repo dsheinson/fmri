@@ -72,7 +72,7 @@ for(k in 1:length(par))
   if((par[k] == "phi" | par[k] == "SNR") & "M001" %in% mods) mod = mods[-which(mods == "M001")] else mod = mods
   Nm = length(mod)
   pdf(paste(gpath,"craig_mle-",par[k],".pdf",sep=""),width=5*Nm,height=5*Nr)
-  par(mfrow=c(Nr,Nm),mar=c(7,6,5,2)+0.1,mgp=c(4,1,0))
+  par(mfrow=c(Nr,Nm),mar=c(8,12,9,2)+0.1,mgp=c(7.5,1,0))
   ylab = c("FP","IPS-left","IPS-right","PV","SV-left","SV-right")
   if(length(mod) > 1) for(l in 2:length(mod)) ylab = cbind(ylab,"")
   for(j in 1:Nr)
@@ -92,25 +92,25 @@ for(k in 1:length(par))
         tmp = bkde2D(cbind(mle[ind,1,j,i],mle[ind,2,j,i]), b, range.x=list(x1=c(min(mle[ind,1,j,])-1.5*b[1],max(mle[ind,1,j,]))+1.5*b[1],x2=c(min(mle[ind,2,j,])-1.5*b[2],max(mle[ind,2,j,])+1.5*b[2])))
         if(j == 1)
         {
-          image(tmp$x1,tmp$x2,-tmp$fhat, xlab=xlab[i], ylab=ylab[j,i], main=mlabels[i], cex.lab=2.5,cex.axis=1.25,cex.main=2.5)
-          if(i == 1) mtext(expr[2], side=2, line=1.5, cex=1.8)
+          image(tmp$x1,tmp$x2,-tmp$fhat, xlab=xlab[i], ylab=ylab[j,i], main=mlabels[i], cex.lab=4,cex.axis=1.9,cex.main=4)
+          if(i == 1) mtext(expr[2], side=2, line=2.5, cex=3)
         } else {
-          image(tmp$x1,tmp$x2,-tmp$fhat, xlab="", ylab=ylab[j,i], main="", cex.lab=2.5,cex.axis=1.25)
+          image(tmp$x1,tmp$x2,-tmp$fhat, xlab="", ylab=ylab[j,i], main="", cex.lab=4,cex.axis=1.9)
         }
         #if(mod[i] != "M001") mtext(paste("Error rate: ",error.rate,", Converge rate: ",conv.rate,sep=""),side=3)
         contour(tmp$x1,tmp$x2,tmp$fhat,add=TRUE,drawlabels=F)
         abline(h=0)
-        points(centers[[i]][[j]][,1], centers[[i]][[j]][,2], pch='x', col=4,cex=2)
+        points(centers[[i]][[j]][,1], centers[[i]][[j]][,2], pch='x', col=4,cex=3.5,lwd=3)
       } else if(par[k] == "phi") {
         xlab = expr[3]
         if(length(mod) > 1) for(l in 2:length(mod)) xlab = c(xlab,"")
         if(j == 1)
         {
-          hist(mle[,3,j,i], xlab=xlab[i], ylab=ylab[j,i], main=mlabels[i], cex.lab=2.5, cex.axis=1.25, cex.main=2.5)
+          hist(mle[,3,j,i], xlab=xlab[i], ylab=ylab[j,i], main=mlabels[i], cex.lab=4, cex.axis=1.9, cex.main=4)
         } else {
-          hist(mle[,3,j,i], xlab="", ylab=ylab[j,i], main="", cex.lab=2.5, cex.axis=1.25)
+          hist(mle[,3,j,i], xlab="", ylab=ylab[j,i], main="", cex.lab=4, cex.axis=1.9)
         }
-        abline(v=centers[[i]][[j]][,3],col=4,lwd=1.5)
+        abline(v=centers[[i]][[j]][,3],col=4,lwd=4)
       } else if(par[k] == "sigma") {
         if(mod[i] != "M001")
         {
@@ -121,22 +121,22 @@ for(k in 1:length(par))
           tmp = bkde2D(cbind(mle[ind,4,j,i],mle[ind,5,j,i]), b, range.x=list(x1=c(0,max(mle[ind,4,j,i]) + 1.5*b[1]),x2=c(0,max(mle[ind,5,j,i]) + 1.5*b[2])))
           if(j == 1)
           {
-            image(tmp$x1,tmp$x2,-tmp$fhat, xlab=xlab[i], ylab=ylab[j,i], main=mlabels[i], cex.lab=2.5,cex.axis=1.25,cex.main=2.5)
-            if(i == 1) mtext(expr[5], side=2, line=1.5, cex=1.8)
+            image(tmp$x1,tmp$x2,-tmp$fhat, xlab=xlab[i], ylab=ylab[j,i], main=mlabels[i], cex.lab=4,cex.axis=1.9,cex.main=4)
+            if(i == 1) mtext(expr[5], side=2, line=2.5, cex=3)
           } else {
-            image(tmp$x1,tmp$x2,-tmp$fhat, xlab="", ylab=ylab[j,i], main="", cex.lab=2.5,cex.axis=1.25)
+            image(tmp$x1,tmp$x2,-tmp$fhat, xlab="", ylab=ylab[j,i], main="", cex.lab=4,cex.axis=1.9)
           }
           contour(tmp$x1,tmp$x2,tmp$fhat,add=TRUE,drawlabels=F)
-          points(centers[[i]][[j]][,4], centers[[i]][[j]][,5], pch='x', col=4,cex=2)
+          points(centers[[i]][[j]][,4], centers[[i]][[j]][,5], pch='x', col=4,cex=3.5,lwd=3)
         } else {
           if(length(mod) > 1) for(l in 2:length(mod)) xlab = c(xlab,"")
           if(j == 1)
           {
-            hist(mle[,5,j,i], xlab=expr[5], ylab="", main=mlabels[i], cex.lab=2.5, cex.axis=1.25, cex.main=2.5)
+            hist(mle[,5,j,i], xlab=expr[5], ylab="", main=mlabels[i], cex.lab=4, cex.axis=1.9, cex.main=4)
           } else {
-            hist(mle[,5,j,i], xlab="", ylab="", main="", cex.lab=2.5, cex.axis=1.25)
+            hist(mle[,5,j,i], xlab="", ylab="", main="", cex.lab=4, cex.axis=1.9)
           }
-          if(j < 5) abline(v=centers[[i]][[j]][,5],col=4,lwd=1.5) else abline(v=centers[[i]][[j]][,3],col=4,lwd=1.5)
+          if(j < 5) abline(v=centers[[i]][[j]][,5],col=4,lwd=4) else abline(v=centers[[i]][[j]][,3],col=4,lwd=4)
         }
       } else if(par[k] == "SNR"){
         if(mod[i] != "M001")
@@ -145,16 +145,16 @@ for(k in 1:length(par))
           if(mod[i] == "M011") snrs = log(mle[,4,j,i]/mle[,5,j,i]) else snrs = mle[,4,j,i]/mle[,5,j,i]
           if(j == 1)
           {
-            hist(snrs, xlab=xlab, ylab=ylab[j,i], main=mlabels[i], cex.lab=2.5, cex.axis=1.25, cex.main=2.5)
+            hist(snrs, xlab=xlab, ylab=ylab[j,i], main=mlabels[i], cex.lab=4, cex.axis=1.9, cex.main=4)
           } else {
-            hist(snrs, xlab="", ylab=ylab[j,i], main="", cex.lab=2.5, cex.axis=1.25)
+            hist(snrs, xlab="", ylab=ylab[j,i], main="", cex.lab=4, cex.axis=1.9)
           }
-          abline(v=ifelse(mod[i] == "M011",0,1))
+          abline(v=ifelse(mod[i] == "M011",0,1),lwd=4)
           if(mod[i] == "M011")
           {
-            abline(v=log(centers[[i]][[j]][,4]/centers[[i]][[j]][,5]),col=4,lwd=1.5)
+            abline(v=log(centers[[i]][[j]][,4]/centers[[i]][[j]][,5]),col=4,lwd=4)
           } else {
-            abline(v=centers[[i]][[j]][,4]/centers[[i]][[j]][,5],col=4,lwd=1.5)            
+            abline(v=centers[[i]][[j]][,4]/centers[[i]][[j]][,5],col=4,lwd=4)            
           }
         }
       } else {
