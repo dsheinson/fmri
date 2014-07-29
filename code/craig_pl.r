@@ -163,6 +163,9 @@ craig_pl <- function(n.vox, n.clust, mod.est, n.run, np, dyn, sd.fac=1, mle=FALS
   }
   dimnames(theta.quant)[[3]] = c(alpha/2,.5,1-alpha/2)
   
+  # Compute quantiles for signal-to-noise ratio
+  snr.quant = pf.quantile(out$theta[4,,,drop=FALSE] / out$theta[5,,,drop=FALSE], out$weight, function(x, j) x, c(alpha/2,.5,1-alpha/2))
+  
   # Compute log-marginal likelihood
   lmarglik = pf.lmarglik(out)
   
@@ -176,5 +179,5 @@ craig_pl <- function(n.vox, n.clust, mod.est, n.run, np, dyn, sd.fac=1, mle=FALS
 require(plyr)
 require(doMC)
 registerDoMC()
-mydata = expand.grid(n.vox=1:125,n.clust=1:6,mod.est=c("M101"),n.run=1,np=5000)
+mydata = expand.grid(n.vox=51:75,n.clust=5,mod.est=c("M101"),n.run=1,np=5000)
 m_ply(mydata, craig_pl, .parallel=T)
