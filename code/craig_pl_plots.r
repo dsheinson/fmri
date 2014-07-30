@@ -87,8 +87,8 @@ mix = FALSE
 # Load log marginal likelihoods
 lmargliks = array(NA, c(Nv,Nr,length(mods)))
 x = array(NA, dim(out$x))
-phi.ci = array(NA, c(Nv,3,Nr,length(mods)))
-snr.ci = array(NA, c(Nv,3,Nr,length(mods)))
+phi.ci = array(NA, c(Nv,2,Nr,length(mods)))
+snr.ci = array(NA, c(Nv,2,Nr,length(mods)))
 for(k in 1:length(mods))
 {
   for(j in 1:Nr)
@@ -218,20 +218,26 @@ for(i in 1:Nr)
           if(row == 1 & column == 1)
           {
             pci = eval(bquote(expression(paste(phi,": (",.(round(phi.ci[l,1,i,k],3)),", ",.(round(phi.ci[l,2,i,k],3)),")",sep=""))))
-            ssci = eval(bquote(expression(paste(sigma[s]^2,": (",.(round(snr.ci[l,1,i,k],3)),", ",.(round(snr.ci[l,2,i,k],3)),")",sep=""))))
-#            smci = eval(bquote(expression(paste(hat(sigma)[m]^2,": (",.(round(s2m.ci[l,1,i,k],3)),", ",.(round(s2m.ci[l,2,i,k],3)),")",sep=""))))
+            if(l %in% 51:75 & i == 5 & mod[k] == "M101")
+            {
+              ssci = eval(bquote(expression(paste(sigma[s]^2/sigma[m]^2,": (",.(round(snr.ci[l,1,i,k],3)),", ",.(round(snr.ci[l,2,i,k],3)),")",sep=""))))
+            } else {
+              ssci = eval(bquote(expression(paste(sigma[s]^2,": (",.(round(snr.ci[l,1,i,k],3)),", ",.(round(snr.ci[l,2,i,k],3)),")",sep=""))))             
+            }
             plot(0:nt, x[l,,2,i,k], type="l", col=col, ylim=c(ymin,ymax), xlab=xlab, ylab=ylab, cex.lab=4, cex.axis=1.9)
             mtext(pci,side=3,line=3,cex=2)
             mtext(ssci,side=3,cex=2)
-#             mtext(smci,side=3,cex=2)
           } else {
             pci = eval(bquote(expression(paste(phi,": (",.(round(phi.ci[l,1,i,k],3)),", ",.(round(phi.ci[l,2,i,k],3)),")",sep=""))))
-            ssci = eval(bquote(expression(paste(sigma[s]^2,": (",.(round(snr.ci[l,1,i,k],3)),", ",.(round(snr.ci[l,2,i,k],3)),")",sep=""))))
-#            smci = eval(bquote(expression(paste(hat(sigma)[m]^2,": (",.(round(s2m.ci[l,1,i,k],3)),", ",.(round(s2m.ci[l,2,i,k],3)),")",sep=""))))
+            if(l %in% 51:75 & i == 5 & mod[k] == "M101")
+            {
+              ssci = eval(bquote(expression(paste(sigma[s]^2/sigma[m]^2,": (",.(round(snr.ci[l,1,i,k],3)),", ",.(round(snr.ci[l,2,i,k],3)),")",sep=""))))
+            } else {
+              ssci = eval(bquote(expression(paste(sigma[s]^2,": (",.(round(snr.ci[l,1,i,k],3)),", ",.(round(snr.ci[l,2,i,k],3)),")",sep=""))))             
+            }
             plot(0:nt, x[l,,2,i,k], type="l", col=col, ylim=c(ymin,ymax), axes=F, xlab="", ylab="", cex.lab=4, cex.axis=1.9)
             mtext(pci,side=3,line=3,cex=2)
             mtext(ssci,side=3,cex=2)
-#             mtext(smci,side=3,cex=2)
           }
           lines(0:nt, x[l,,1,i,k], col=col, lty=2)
           lines(0:nt, x[l,,3,i,k], col=col, lty=2)
