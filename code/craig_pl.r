@@ -172,7 +172,7 @@ craig_pl <- function(n.vox, n.clust, mod.est, n.run, np, dyn, sd.fac=1, mle=FALS
   # Save particles?
   if(!save.all) out = "didn't save particles"
   
-  pf.out = list(out=out,fit=fit,lmarglik=lmarglik,state.quant.filt=state.quant.filt,state.quant.smooth=state.quant.smooth,theta.quant=theta.quant,prior=prior)
+  pf.out = list(out=out,fit=fit,lmarglik=lmarglik,state.quant.filt=state.quant.filt,state.quant.smooth=state.quant.smooth,theta.quant=theta.quant,snr.quant=snr.quant,prior=prior)
   save(pf.out, file=paste(dpath,paste(n.vox,n.clust,mod.est,n.run,np,sd.fac,mle,smooth,mix,sep="-"),".rdata",sep=""))
 }
 

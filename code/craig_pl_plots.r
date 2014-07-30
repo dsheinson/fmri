@@ -88,8 +88,7 @@ mix = FALSE
 lmargliks = array(NA, c(Nv,Nr,length(mods)))
 x = array(NA, dim(out$x))
 phi.ci = array(NA, c(Nv,3,Nr,length(mods)))
-s2s.ci = array(NA, c(Nv,3,Nr,length(mods)))
-s2m.ci = array(NA, c(Nv,3,Nr,length(mods)))
+snr.ci = array(NA, c(Nv,3,Nr,length(mods)))
 for(k in 1:length(mods))
 {
   for(j in 1:Nr)
@@ -105,14 +104,17 @@ for(k in 1:length(mods))
           if(mods[k] == "M101")
           {
             x[i,,,j,k] = pf.out$state.quant.filt[,1,]
-            phi.ci[i,,j,k] = pf.out$theta.quant[nt+1,3,]
-            s2s.ci[i,,j,k] = pf.out$theta.quant[nt+1,4,]
-            s2m.ci[i,,j,k] = pf.out$theta.quant[nt+1,5,]
+            phi.ci[i,,j,k] = pf.out$theta.quant[nt+1,3,c(1,3)]
+            if(j == 5 & i %in% 51:75)
+            {
+              snr.ci[i,,j,k] = pf.out$snr.quant[nt+1,1,c(1,3)]
+            } else {
+              snr.ci[i,,j,k] = pf.out$theta.quant[nt+1,4,c(1,3)]
+            }
           } else {
             x[i,,c(1,3),j,k] = pf.out$state.quant.filt[,1,]
-            phi.ci[i,c(1,3),j,k] = pf.out$theta.quant[nt+1,3,]
-            s2s.ci[i,c(1,3),j,k] = pf.out$theta.quant[nt+1,4,]
-            s2m.ci[i,c(1,3),j,k] = pf.out$theta.quant[nt+1,5,]
+            phi.ci[i,,j,k] = pf.out$theta.quant[nt+1,3,]
+            snr.ci[i,,j,k] = pf.out$theta.quant[nt+1,4,]
           }
         }
       } else {
@@ -216,7 +218,7 @@ for(i in 1:Nr)
           if(row == 1 & column == 1)
           {
             pci = eval(bquote(expression(paste(phi,": (",.(round(phi.ci[l,1,i,k],3)),", ",.(round(phi.ci[l,2,i,k],3)),")",sep=""))))
-            ssci = eval(bquote(expression(paste(sigma[s]^2,": (",.(round(s2s.ci[l,1,i,k],3)),", ",.(round(s2s.ci[l,2,i,k],3)),")",sep=""))))
+            ssci = eval(bquote(expression(paste(sigma[s]^2,": (",.(round(snr.ci[l,1,i,k],3)),", ",.(round(snr.ci[l,2,i,k],3)),")",sep=""))))
 #            smci = eval(bquote(expression(paste(hat(sigma)[m]^2,": (",.(round(s2m.ci[l,1,i,k],3)),", ",.(round(s2m.ci[l,2,i,k],3)),")",sep=""))))
             plot(0:nt, x[l,,2,i,k], type="l", col=col, ylim=c(ymin,ymax), xlab=xlab, ylab=ylab, cex.lab=4, cex.axis=1.9)
             mtext(pci,side=3,line=3,cex=2)
@@ -224,7 +226,7 @@ for(i in 1:Nr)
 #             mtext(smci,side=3,cex=2)
           } else {
             pci = eval(bquote(expression(paste(phi,": (",.(round(phi.ci[l,1,i,k],3)),", ",.(round(phi.ci[l,2,i,k],3)),")",sep=""))))
-            ssci = eval(bquote(expression(paste(sigma[s]^2,": (",.(round(s2s.ci[l,1,i,k],3)),", ",.(round(s2s.ci[l,2,i,k],3)),")",sep=""))))
+            ssci = eval(bquote(expression(paste(sigma[s]^2,": (",.(round(snr.ci[l,1,i,k],3)),", ",.(round(snr.ci[l,2,i,k],3)),")",sep=""))))
 #            smci = eval(bquote(expression(paste(hat(sigma)[m]^2,": (",.(round(s2m.ci[l,1,i,k],3)),", ",.(round(s2m.ci[l,2,i,k],3)),")",sep=""))))
             plot(0:nt, x[l,,2,i,k], type="l", col=col, ylim=c(ymin,ymax), axes=F, xlab="", ylab="", cex.lab=4, cex.axis=1.9)
             mtext(pci,side=3,line=3,cex=2)
