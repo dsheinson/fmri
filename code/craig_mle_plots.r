@@ -10,7 +10,7 @@ load(paste(dpath,"craig_mle.rdata",sep=""))
 attach(out)
 
 # Plot parameters
-expr = expression(beta[0],beta[1],phi,sigma[s]^2,sigma[m]^2); Np = length(expr)
+expr = expression(hat(beta[0]),hat(beta[1]),hat(phi),hat(sigma)[s]^2,hat(sigma)[m]^2); Np = length(expr)
 par = c("beta","phi","sigma","SNR")
 regions = dimnames(mle)[[3]]; Nr = length(regions)
 mods = dimnames(mle)[[4]]; Nm = length(mods)
@@ -72,7 +72,7 @@ for(k in 1:length(par))
   if((par[k] == "phi" | par[k] == "SNR") & "M001" %in% mods) mod = mods[-which(mods == "M001")] else mod = mods
   Nm = length(mod)
   pdf(paste(gpath,"craig_mle-",par[k],".pdf",sep=""),width=5*Nm,height=5*Nr)
-  par(mfrow=c(Nr,Nm),mar=c(8,12,9,2)+0.1,mgp=c(7.5,1,0))
+  par(mfrow=c(Nr,Nm),mar=c(10,12,9,2)+0.1,mgp=c(8.5,1,0))
   ylab = c("FP","IPS-left","IPS-right","PV","SV-left","SV-right")
   if(length(mod) > 1) for(l in 2:length(mod)) ylab = cbind(ylab,"")
   for(j in 1:Nr)
