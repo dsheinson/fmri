@@ -212,9 +212,16 @@ for(i in 1:Nr)
         column = ifelse(ind %% 5 == 0,ind %/% 5,ind %/% 5 + 1)
         row = 6 - ifelse(ind %% 5 == 0, 5, ind %% 5)
         par(mfg=c(row,column))
-        if(error[l,i,k] == 0 & converge[l,i,k] == 0)
+        if(TRUE)#error[l,i,k] == 0 & converge[l,i,k] == 0)
         {
-          col = ifelse(cluster[l,i,k] == 1, 6, 1)
+          if(mod[k] == "M011")
+          {
+            ymin = min(x[l,-(1:25),,i,k],na.rm=T)
+            ymax = max(x[l,-(1:25),,i,k],na.rm=T)
+            ymax = ymax + 0.04*(ymax-ymin)
+          }
+          
+          if(!is.na(cluster[l,i,k])) col = ifelse(cluster[l,i,k] == 1, 6, 1) else col = 1
           if(row == 1 & column == 1)
           {
             pci = eval(bquote(expression(paste(phi,": (",.(round(phi.ci[l,1,i,k],3)),", ",.(round(phi.ci[l,2,i,k],3)),")",sep=""))))
