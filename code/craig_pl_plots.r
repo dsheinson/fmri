@@ -105,7 +105,7 @@ for(k in 1:length(mods))
           {
             x[i,,,j,k] = pf.out$state.quant.filt[,1,]
             phi.ci[i,,j,k] = pf.out$theta.quant[nt+1,3,c(1,3)]
-            if(j == 5 & i %in% 51:75)
+            if((j == 5 & i %in% 51:75) | (j == 3 & i %in% 1:25) )
             {
               snr.ci[i,,j,k] = pf.out$snr.quant[nt+1,1,c(1,3)]
             } else {
@@ -218,7 +218,7 @@ for(i in 1:Nr)
           if(row == 1 & column == 1)
           {
             pci = eval(bquote(expression(paste(phi,": (",.(round(phi.ci[l,1,i,k],3)),", ",.(round(phi.ci[l,2,i,k],3)),")",sep=""))))
-            if(l %in% 51:75 & i == 5 & mod[k] == "M101")
+            if((l %in% 51:75 & i == 5 & mod[k] == "M101") | (l %in% 1:25 & i == 3 & mod[k] == "M101"))
             {
               ssci = eval(bquote(expression(paste(sigma[s]^2/sigma[m]^2,": (",.(round(snr.ci[l,1,i,k],3)),", ",.(round(snr.ci[l,2,i,k],3)),")",sep=""))))
             } else {
@@ -229,7 +229,7 @@ for(i in 1:Nr)
             mtext(ssci,side=3,cex=2)
           } else {
             pci = eval(bquote(expression(paste(phi,": (",.(round(phi.ci[l,1,i,k],3)),", ",.(round(phi.ci[l,2,i,k],3)),")",sep=""))))
-            if(l %in% 51:75 & i == 5 & mod[k] == "M101")
+            if(l %in% 51:75 & i == 5 & mod[k] == "M101" | (l %in% 1:25 & i == 3 & mod[k] == "M101"))
             {
               ssci = eval(bquote(expression(paste(sigma[s]^2/sigma[m]^2,": (",.(round(snr.ci[l,1,i,k],3)),", ",.(round(snr.ci[l,2,i,k],3)),")",sep=""))))
             } else {
