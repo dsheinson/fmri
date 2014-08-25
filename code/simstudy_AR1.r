@@ -131,12 +131,12 @@ for(k in 1:(nb-1))
   {
     plot(fpr[,1,i],tpr[,1,i,k],type="l",xlim=c(0,1),ylim=c(0,1),axes=ifelse(i==1,TRUE,FALSE),xlab=ifelse(i==1,"FPR",""),ylab=ifelse(i==1,"TPR",""),main=eval(bquote(expression(paste(phi,"=",.(phi[i]))))),cex.lab=1.75,cex.main=1.75)
     if(i != 1) box()
-    lines(fpr[,2,i],tpr[,2,i,k],col=2)
-    lines(fpr[,3,i],tpr[,3,i,k],col=3)
-    lines(fpr[,4,i],tpr[,4,i,k],col=4)
+    lines(fpr[,2,i],tpr[,2,i,k],col=2,lwd=5)
+    lines(fpr[,3,i],tpr[,3,i,k],col=3,lwd=2)
+    lines(fpr[,4,i],tpr[,4,i,k],col=4,lwd=2)
     abline(0,1,lty=2)
     #mtext(paste("Negative DF rate:",neg.df[i,k]),side=3,cex=0.85)
-    legend("bottomright",c("OLS","PW","REML","REMLc"),lty=c(1,1,1,1),col=c(1,2,3,4),cex=1.5)
+    if(i == 1) legend("bottomright",c("OLS","PW","REML","REMLc"),lty=c(1,1,1,1),col=c(1,2,3,4),lwd=c(1,5,2,2),cex=1.5)
   }
   dev.off()
 }
