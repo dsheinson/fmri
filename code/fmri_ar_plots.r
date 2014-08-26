@@ -573,14 +573,14 @@ fmri_pl_loglik <- function(mod.sim, nsims, np, mods, npars, wpars, nruns, sd.fac
         xlab=""
         ylab=""
       }
-      plot(phi.snr[[1]][,1,i],phi.snr[[1]][,2,i],type="b",xlim=c(xmin,xmax),ylim=c(ymin,ymax),xlab=xlab,ylab=ylab,main=substitute(paste(kappa,"=",aa),list(aa=sd.fac[i])),cex.lab=2.25,cex.main=2.25,cex.axis=1.2)
+      plot(phi.snr[[1]][,1,i],phi.snr[[1]][,2,i],xlim=c(xmin,xmax),ylim=c(ymin,ymax),xlab=xlab,ylab=ylab,main=substitute(paste(kappa,"=",aa),list(aa=sd.fac[i])),cex.lab=2.25,cex.main=2.25,cex.axis=1.2)
       if(length(phi.snr) > 1)
       {
-        for(j in 2:length(phi.snr)) lines(phi.snr[[j]][,1,i],phi.snr[[j]][,2,i],type="b",col=2*(j-1))
+        for(j in 2:length(phi.snr)) points(phi.snr[[j]][,1,i],phi.snr[[j]][,2,i])
       }
       if(i == 1)
       {
-        legend("topright",legend=nsims,lty=rep(1,length(nsims)),col=c(1,2*(2:length(nsims)-1)),title=eval(bquote(expression(paste("Sim from ",M[.(paste(strsplit(mod.sim.name,"")[[1]][2:4],sep="",collapse=""))],sep="")))),cex=1.2)
+        #legend("topright",legend=nsims,lty=rep(1,length(nsims)),col=c(1,2*(2:length(nsims)-1)),title=eval(bquote(expression(paste("Sim from ",M[.(paste(strsplit(mod.sim.name,"")[[1]][2:4],sep="",collapse=""))],sep="")))),cex=1.2)
       }
     }
     dev.off()
