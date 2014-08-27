@@ -267,7 +267,7 @@ for(i in 1:Nr)
       }
       par(mfg=c(1,6))
       plot(0:5,0:5,col="white",axes=FALSE,xlab="",ylab="")
-      legend(0,4.5,c("Clust. H","Clust. L","95% CI"), lty=c(1,1,2), cex=3, col=c(6,1,1))
+      if(i >= 5) legend(0,4.5,c("Clust. H","Clust. L","95% CI"), lty=c(1,1,2), cex=3, col=c(6,1,1))
       par(mfg=c(2,6))
       plot(0:5,0:5,col="white",axes=FALSE,xlab="",ylab="")
       legend(0,4.5,mlabels[c(2,1,3)], fill=cols[c(2,1,3)], cex=3)   
